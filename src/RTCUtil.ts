@@ -200,5 +200,11 @@ export function normalizeConstraints(constraints) {
         }
     }
 
+    if(constraints['video'] && constraints['video'].hasOwnProperty('vb')) {
+        if(c['video']) {
+            c['video'].vb = true;
+        }
+    }
+
     return c;
 }

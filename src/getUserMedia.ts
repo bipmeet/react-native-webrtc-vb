@@ -14,7 +14,6 @@ interface Constraints {
 }
 
 export default function getUserMedia(constraints: Constraints = {}) {
-    console.log("getuserMedia : ", constraints)
     // According to
     // https://www.w3.org/TR/mediacapture-streams/#dom-mediadevices-getusermedia,
     // the constraints argument is a dictionary of type MediaStreamConstraints.
@@ -31,6 +30,7 @@ export default function getUserMedia(constraints: Constraints = {}) {
 
     // Normalize constraints.
     constraints = RTCUtil.normalizeConstraints(constraints);
+    console.log("sidal 44444 constraints: ", constraints);
 
     // Request required permissions
     const reqPermissions: Array<Promise<boolean>> = [];
