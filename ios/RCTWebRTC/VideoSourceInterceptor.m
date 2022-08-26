@@ -29,14 +29,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) CVPixelBufferRef leftRotatedBackgroundBuffer;
 @property (nonatomic) CVPixelBufferRef upsideRotatedBackgroundBuffer;
 
+@property (nonatomic) UIImage *backgroundImage;
+@property (nonatomic) UIImage *rightRotatedBackgroundImage;
+@property (nonatomic) UIImage *leftRotatedBackgroundImage;
+@property (nonatomic) UIImage *upsideDownBackgroundImage;
+
 @end
 
 @implementation VideoSourceInterceptor
-
-NSString * const portraitBackgroundImageUrl = @"https://i.ibb.co/5RMCH5G/portrait.jpg";
-NSString * const rightRotatedBackgroundImageUrl = @"https://i.ibb.co/YNsR7St/rotated-Right.jpg";
-NSString * const leftRotatedBackgroundImageUrl = @"https://i.ibb.co/cwwSKFn/rotated-Left.jpg";
-NSString * const upsideBackgroundImageUrl = @"https://i.ibb.co/mcSJZQk/upside.jpg";
 
 - (instancetype)initWithVideoSource: (RTCVideoSource*) videoSource {
     if (self = [super init]) {
@@ -48,26 +48,17 @@ NSString * const upsideBackgroundImageUrl = @"https://i.ibb.co/mcSJZQk/upside.jp
         
         self.segmenter = [MLKSegmenter segmenterWithOptions:options];
         
-        _backgroundBuffer = [self pixelBufferFromImageUrl:portraitBackgroundImageUrl];
-        _rightRotatedBackgroundBuffer = [self pixelBufferFromImageUrl:rightRotatedBackgroundImageUrl];
-        _leftRotatedBackgroundBuffer = [self pixelBufferFromImageUrl:leftRotatedBackgroundImageUrl];
-        _upsideRotatedBackgroundBuffer = [self pixelBufferFromImageUrl:upsideBackgroundImageUrl];
+        _backgroundImage = [UIImage imageNamed:@"portraitBackground"];
+        _rightRotatedBackgroundImage = [UIImage imageNamed:@"rightRotatedBackground"];
+        _leftRotatedBackgroundImage = [UIImage imageNamed:@"leftRotatedBackground"];
+        _upsideDownBackgroundImage = [UIImage imageNamed:@"upsideDownBackground"];
+        
+        _backgroundBuffer = [self pixelBufferFromCGImage:_backgroundImage.CGImage];
+        _rightRotatedBackgroundBuffer = [self pixelBufferFromCGImage:_rightRotatedBackgroundImage.CGImage];
+        _leftRotatedBackgroundBuffer = [self pixelBufferFromCGImage:_leftRotatedBackgroundImage.CGImage];
+        _upsideRotatedBackgroundBuffer = [self pixelBufferFromCGImage:_upsideDownBackgroundImage.CGImage];
     }
     return self;
-}
-
-- (CVPixelBufferRef) pixelBufferFromImageUrl: (NSString *) imageURL
-{
-    NSURL *url = [NSURL URLWithString:imageURL];
-    CGDataProviderRef dataProvider = CGDataProviderCreateWithURL((CFURLRef)url);
-    CGImageRef backgroundRef = CGImageCreateWithJPEGDataProvider(dataProvider, NULL, true, kCGRenderingIntentDefault);
-    
-    CVPixelBufferRef resultBuffer = NULL;
-    resultBuffer = [self pixelBufferFromCGImage:backgroundRef];
-    
-    CGDataProviderRelease(dataProvider);
-    
-    return resultBuffer;
 }
 
 - (CVPixelBufferRef) pixelBufferFromCGImage: (CGImageRef) image
