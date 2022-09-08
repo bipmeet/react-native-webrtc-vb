@@ -48,7 +48,7 @@
     NSDictionary *videoContraints = constraints[@"video"];
     RTCCameraVideoCapturer *videoCapturer;
 
-    NSLog(@"SIDAL video constraint %@", videoContraints);
+    NSLog(@"Video constraint in create video track: %@", videoContraints);
     
     // If virtual backround is enabled, use video source interceptor before video source
     if (videoContraints[@"vb"]) {
@@ -131,7 +131,7 @@ RCT_EXPORT_METHOD(getUserMedia:(NSDictionary *)constraints
                successCallback:(RCTResponseSenderBlock)successCallback
                  errorCallback:(RCTResponseSenderBlock)errorCallback) {
     
-    NSLog(@"SIDAL video constraint in get user media %@", constraints);
+    NSLog(@"Video constraint in RTCMediaStream get user media %@", constraints);
     
   RTCAudioTrack *audioTrack = nil;
   RTCVideoTrack *videoTrack = nil;

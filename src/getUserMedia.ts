@@ -30,7 +30,7 @@ export default function getUserMedia(constraints: Constraints = {}) {
 
     // Normalize constraints.
     constraints = RTCUtil.normalizeConstraints(constraints);
-    console.log("sidal 44444 constraints: ", constraints);
+    console.log("Constraints in getUserMedia: ", constraints);
 
     // Request required permissions
     const reqPermissions: Array<Promise<boolean>> = [];

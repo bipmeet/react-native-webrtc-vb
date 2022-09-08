@@ -242,8 +242,8 @@
         return;
     }
     
-    device.activeVideoMinFrameDuration = CMTimeMake(1, 20);
-    device.activeVideoMaxFrameDuration = CMTimeMake(1, 15);
+    device.activeVideoMinFrameDuration = CMTimeMake(1, 15);
+    device.activeVideoMaxFrameDuration = CMTimeMake(1, 12);
     
     [device unlockForConfiguration];
 }
