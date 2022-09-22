@@ -102,7 +102,7 @@
     __weak VideoCaptureController *weakSelf = self;
 
     if (self.vb) {
-        // Selfie Segmentator library requires kCVPixelFormatType_32BGRA format
+        // ML Kit library requires kCVPixelFormatType_32BGRA format
         for (AVCaptureOutput *output in _capturer.captureSession.outputs) {
             RCTLog(@"Changing capturer output to %@", ((AVCaptureVideoDataOutput*)output).videoSettings);
             if([output isKindOfClass:AVCaptureVideoDataOutput.class]) {
@@ -242,8 +242,13 @@
         return;
     }
     
-    device.activeVideoMinFrameDuration = CMTimeMake(1, 15);
-    device.activeVideoMaxFrameDuration = CMTimeMake(1, 12);
+    if (self.vb) {
+        device.activeVideoMinFrameDuration = CMTimeMake(1, 15);
+        device.activeVideoMaxFrameDuration = CMTimeMake(1, 12);
+    } else {
+        device.activeVideoMinFrameDuration = CMTimeMake(1, 20);
+        device.activeVideoMaxFrameDuration = CMTimeMake(1, 15);
+    }
     
     [device unlockForConfiguration];
 }
