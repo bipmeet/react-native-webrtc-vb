@@ -195,11 +195,12 @@ class GetUserMediaImpl {
 
             Log.d(TAG, "getUserMedia(video): " + videoConstraintsMap);
 
+            //CameraCaptureController constructor sets frame rate to 5 if virtual background is on.
             CameraCaptureController cameraCaptureController = new CameraCaptureController(
                 cameraEnumerator,
                 videoConstraintsMap);
 
-            videoTrack = createVideoTrack(cameraCaptureController);
+            videoTrack = createVideoTrack(cameraCaptureController, videoConstraintsMap.hasKey("vb"));
         }
 
         if (audioTrack == null && videoTrack == null) {
@@ -355,10 +356,10 @@ class GetUserMediaImpl {
         int height = displayMetrics.heightPixels;
         ScreenCaptureController screenCaptureController
             = new ScreenCaptureController(reactContext.getCurrentActivity(), width, height, mediaProjectionPermissionResultData);
-        return createVideoTrack(screenCaptureController);
+        return createVideoTrack(screenCaptureController, false);
     }
 
-    private VideoTrack createVideoTrack(AbstractVideoCaptureController videoCaptureController) {
+    private VideoTrack createVideoTrack(AbstractVideoCaptureController videoCaptureController, Boolean vb) {
         videoCaptureController.initializeVideoCapturer();
 
         VideoCapturer videoCapturer = videoCaptureController.videoCapturer;
@@ -378,6 +379,11 @@ class GetUserMediaImpl {
 
         VideoSource videoSource = pcFactory.createVideoSource(videoCapturer.isScreencast());
         videoCapturer.initialize(surfaceTextureHelper, reactContext, videoSource.getCapturerObserver());
+
+        if(vb) {
+            VideoProcessor p = new VirtualBackgroundVideoProcessor(reactContext, surfaceTextureHelper);
+            videoSource.setVideoProcessor(p);
+        }
 
         String id = UUID.randomUUID().toString();
         VideoTrack track = pcFactory.createVideoTrack(id, videoSource);
