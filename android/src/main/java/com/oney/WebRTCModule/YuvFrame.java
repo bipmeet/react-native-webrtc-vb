@@ -134,6 +134,7 @@ public class YuvFrame {
         if ( rotationDegree == 90 || rotationDegree == -270 )
         {
             final Matrix m = new Matrix();
+            m.preScale(-1, 1);
             m.postRotate( 90 );
 
             return Bitmap.createBitmap( bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true );
@@ -141,6 +142,7 @@ public class YuvFrame {
         else if ( rotationDegree == 180 || rotationDegree == -180 )
         {
             final Matrix m = new Matrix();
+            m.preScale(-1, 1);
             m.postRotate( 180 );
 
             return Bitmap.createBitmap( bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true );
@@ -148,14 +150,17 @@ public class YuvFrame {
         else if ( rotationDegree == 270 || rotationDegree == -90 )
         {
             final Matrix m = new Matrix();
+            m.preScale(1, -1);
             m.postRotate( 270 );
 
             return Bitmap.createBitmap( bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true );
         }
         else
         {
-            // Don't rotate, just return the Bitmap
-            return bitmap;
+            final Matrix m = new Matrix();
+            m.preScale(-1, 1);
+
+            return Bitmap.createBitmap( bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true );
         }
     }
 
