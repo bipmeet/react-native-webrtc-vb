@@ -37,6 +37,10 @@ public class VirtualBackgroundVideoProcessor implements VideoProcessor {
     private final SurfaceTextureHelper surfaceTextureHelper;
     final YuvConverter yuvConverter = new YuvConverter();
 
+    private YuvFrame yuvFrame;
+    private Bitmap inputFrameBitmap;
+    private int frameCounter = 0;
+
     final Bitmap backgroundImage;
     final Bitmap scaled;
 
@@ -73,63 +77,73 @@ public class VirtualBackgroundVideoProcessor implements VideoProcessor {
     @Override
     public void onFrameCaptured(VideoFrame videoFrame) {
 
-        YuvFrame yuvFrame = new YuvFrame(videoFrame);
-        Bitmap inputFrameBitmap = yuvFrame.getBitmap();
+        if(frameCounter == 0) {
+            yuvFrame = new YuvFrame(videoFrame);
+            inputFrameBitmap = yuvFrame.getBitmap();
 
-        InputImage image = InputImage.fromBitmap(inputFrameBitmap, 0);
+            InputImage image = InputImage.fromBitmap(inputFrameBitmap, 0);
 
-        Task<SegmentationMask> result =
-            segmenter.process(image)
-                .addOnSuccessListener(
-                    new OnSuccessListener<SegmentationMask>() {
-                        @Override
-                        public void onSuccess(SegmentationMask mask) {
+            Task<SegmentationMask> result =
+                segmenter.process(image)
+                    .addOnSuccessListener(
+                        new OnSuccessListener<SegmentationMask>() {
+                            @Override
+                            public void onSuccess(SegmentationMask mask) {
 
-                            mask.getBuffer().rewind();
-                            int[] arr = maskColorsFromByteBuffer(mask);
-                            Bitmap segmentedBitmap = Bitmap.createBitmap(
-                                arr, mask.getWidth(), mask.getHeight(), Bitmap.Config.ARGB_8888
-                            );
-                            arr = null;
+                                mask.getBuffer().rewind();
+                                int[] arr = maskColorsFromByteBuffer(mask);
+                                Bitmap segmentedBitmap = Bitmap.createBitmap(
+                                    arr, mask.getWidth(), mask.getHeight(), Bitmap.Config.ARGB_8888
+                                );
+                                arr = null;
 
-                            Bitmap segmentedBitmapMutable = segmentedBitmap.copy(Bitmap.Config.ARGB_8888, true);
-                            segmentedBitmap.recycle();
-                            Canvas canvas = new Canvas(segmentedBitmapMutable);
+                                Bitmap segmentedBitmapMutable = segmentedBitmap.copy(Bitmap.Config.ARGB_8888, true);
+                                segmentedBitmap.recycle();
+                                Canvas canvas = new Canvas(segmentedBitmapMutable);
 
-                            Paint paint = new Paint();
-                            paint.setXfermode(new PorterDuffXfermode(SRC_IN));
-                            canvas.drawBitmap(scaled, 0, 0, paint);
-                            paint.setXfermode(new PorterDuffXfermode(DST_OVER));
-                            canvas.drawBitmap(inputFrameBitmap, 0, 0, paint);
+                                Paint paint = new Paint();
+                                paint.setXfermode(new PorterDuffXfermode(SRC_IN));
+                                canvas.drawBitmap(scaled, 0, 0, paint);
+                                paint.setXfermode(new PorterDuffXfermode(DST_OVER));
+                                canvas.drawBitmap(inputFrameBitmap, 0, 0, paint);
 
-                            surfaceTextureHelper.getHandler().post(new Runnable() {
-                                @Override
-                                public void run() {
+                                surfaceTextureHelper.getHandler().post(new Runnable() {
+                                    @Override
+                                    public void run() {
 
-                                    GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-                                    TextureBufferImpl buffer = new TextureBufferImpl(segmentedBitmapMutable.getWidth(),
-                                        segmentedBitmapMutable.getHeight(), VideoFrame.TextureBuffer.Type.RGB,
-                                        GLES20.GL_TEXTURE0, new Matrix(), surfaceTextureHelper.getHandler(), yuvConverter, null);
-                                    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0);
+                                        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+                                        TextureBufferImpl buffer = new TextureBufferImpl(segmentedBitmapMutable.getWidth(),
+                                            segmentedBitmapMutable.getHeight(), VideoFrame.TextureBuffer.Type.RGB,
+                                            GLES20.GL_TEXTURE0, new Matrix(), surfaceTextureHelper.getHandler(), yuvConverter, null);
+                                        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0);
 
-                                    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-                                    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
-                                    GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, segmentedBitmapMutable, 0);
-                                    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+                                        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+                                        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+                                        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, segmentedBitmapMutable, 0);
+                                        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
 
-                                    VideoFrame.I420Buffer i420Buf = yuvConverter.convert(buffer);
-                                    VideoFrame out = new VideoFrame(i420Buf, 180, videoFrame.getTimestampNs());
+                                        VideoFrame.I420Buffer i420Buf = yuvConverter.convert(buffer);
+                                        VideoFrame out = new VideoFrame(i420Buf, 180, videoFrame.getTimestampNs());
 
-                                    buffer.release();
-                                    yuvFrame.dispose();
+                                        buffer.release();
+                                        //yuvFrame.dispose();
 
-                                    target.onFrame(out);
-                                    out.release();
-                                }
-                            });
+                                        target.onFrame(out);
+                                        out.release();
+                                    }
+                                });
 
-                        }
-                    });
+                            }
+                        });
+        }
+        updateFrameCounter();
+    }
+
+    private void updateFrameCounter() {
+        frameCounter++;
+        if(frameCounter == 3) {
+            frameCounter = 0;
+        }
     }
 
     private int[] maskColorsFromByteBuffer(SegmentationMask mask) {

@@ -195,7 +195,6 @@ class GetUserMediaImpl {
 
             Log.d(TAG, "getUserMedia(video): " + videoConstraintsMap);
 
-            //CameraCaptureController constructor sets frame rate to 5 if virtual background is on.
             CameraCaptureController cameraCaptureController = new CameraCaptureController(
                 cameraEnumerator,
                 videoConstraintsMap);
