@@ -31,7 +31,7 @@ Plan B will remain default until adequate support and testing has been completed
 
 ## WebRTC Revision
 
-* Currently used revision: [M100](https://github.com/jitsi/webrtc/releases/tag/v100.0.0)
+* Currently used revision: [M94](https://github.com/jitsi/webrtc/releases/tag/v94.0.0)
 * Supported architectures
   * Android: armeabi-v7a, arm64-v8a, x86, x86_64
   * iOS: arm64, x86_64 (for bitcode support, run [this script](./tools/downloadBitcode.sh))

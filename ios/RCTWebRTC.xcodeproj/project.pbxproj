@@ -307,7 +307,15 @@
 		35A222291CB493700015FD5C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../apple/";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../apple/",
+					"\"${PODS_ROOT}/MLKitSegmentationSelfie/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitSegmentationCommon/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitCommon/Frameworks\"",
+					"\"${PODS_ROOT}/MLImage/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitVision/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitXenoCommon/Frameworks\"",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -318,7 +326,15 @@
 		35A2222A1CB493700015FD5C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../apple/";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../apple/",
+					"\"${PODS_ROOT}/MLKitSegmentationSelfie/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitSegmentationCommon/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitCommon/Frameworks\"",
+					"\"${PODS_ROOT}/MLImage/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitVision/Frameworks\"",
+					"\"${PODS_ROOT}/MLKitXenoCommon/Frameworks\"",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";

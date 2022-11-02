@@ -30,6 +30,7 @@ export default function getUserMedia(constraints: Constraints = {}): Promise<Med
 
     // Normalize constraints.
     constraints = RTCUtil.normalizeConstraints(constraints);
+    console.log("Constraints in getUserMedia: ", constraints);
 
     // Request required permissions
     const reqPermissions: Promise<boolean>[] = [];
